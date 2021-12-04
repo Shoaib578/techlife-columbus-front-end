@@ -63,13 +63,22 @@ function bottomTabNavigations(){
 }
 
 async function logout(props){
-await AsyncStorage.removeItem('user')
-props.navigation.reset({
-  index:0,
-  routes:[{name:'LoginSignUp'}],
- 
-});
+const user = await AsyncStorage.getItem('user')
+const parse = JSON.parse(user)
+if(parse == null){
+  props.navigation.navigate('SignIn')
+}else{
+  await AsyncStorage.removeItem('user')
+  props.navigation.reset({
+    index:0,
+    routes:[{name:'HomeScreen'}],
+   
+  });
 }
+
+}
+
+
 
 function FirstTopNavigator() {
     return (
@@ -172,6 +181,8 @@ function FirstTopNavigator() {
   }
 
   function CustomDrawer (props) {
+  
+
     return(
     <DrawerContentScrollView {...props}>
       <View style={styles.DrawerHeader}>
@@ -183,7 +194,7 @@ function FirstTopNavigator() {
       </View>
       <DrawerItemList {...props}/>
       <View style={{width:'100%', height:56, backgroundColor:'#F9F9F9', marginTop:150, justifyContent:'center', alignItems:'center'}}>
-        <TouchableOpacity onPress={()=>logout(props)}>
+       <TouchableOpacity onPress={()=>logout(props)}>
         <Image style={styles.LogoutIcon} source={require('../assets/logoutIcon.png')}/>
         </TouchableOpacity>
       </View>
@@ -284,7 +295,7 @@ drawer_navigator(navigation){
 
                     <Stack.Screen options={{headerShown:false}} name="HomeScreen" component={this.homeStackScreen}/>
                     <Stack.Screen options={{headerShown:false}} name="EventDetails" component={EventDetails}/>
-                    <Stack.Screen options={{headerShown:false}} name="Profile" component={Profile}/>
+                    <Stack.Screen options={{headerShown:true}} name="Profile" component={Profile}/>
                     <Stack.Screen options={{headerShown:false}} name="TechnologyUpdates" component={TechnologyUpdates}/>
                 </Stack.Navigator>
             </NavigationContainer>

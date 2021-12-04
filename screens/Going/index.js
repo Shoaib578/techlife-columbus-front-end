@@ -8,30 +8,37 @@ class Going extends React.Component{
     state = {
         going_events:[],
         is_loading:true,
-        network_error:false
+        network_error:false,
+        events_length:0
     }
 
 
     get_all_going_events = async()=>{
         const user = await AsyncStorage.getItem('user')
         const parse = JSON.parse(user)
-        fetch(base_url+'/api/get_going_events?user_id='+parse.user_id,{
-            method:'get',
-           
-            headers:{
-                "Accept":"application/json",
-                "Content-Type":"application/json"
-            }
-        })
-        .then(res=>res.json()
-        .then(resp=>{
-            this.setState({going_events:resp.going_events,is_loading:false})
-        })
-        )
-        .catch(err=>{
-            console.log('this is the error '+err)
-            this.setState({network_error:true,is_loading:false})
-        })
+        if(parse == null){
+            this.setState({going_events:[],is_loading:false})
+        }else{
+            fetch(base_url+'/api/get_going_events?user_id='+parse.user_id,{
+                method:'get',
+               
+                headers:{
+                    "Accept":"application/json",
+                    "Content-Type":"application/json"
+                }
+            })
+            .then(res=>res.json()
+            .then(resp=>{
+            
+                this.setState({going_events:resp.going_events,is_loading:false})
+            })
+            )
+            .catch(err=>{
+                console.log('this is the error '+err)
+                this.setState({network_error:true,is_loading:false})
+            })
+        }
+        
 
     }
 

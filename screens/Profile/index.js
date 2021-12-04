@@ -5,13 +5,15 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import Fontisto from 'react-native-vector-icons/Fontisto'
 import base_url from '../../base_url'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import styles from './style'
 class Profile extends React.Component{
     state = {
         user_info:'',
         is_loading:true,
         fullname:'',
         email:'',
-        user_interests:[]
+        user_interests:[],
+        is_logged_in:false
 
     }
 
@@ -101,27 +103,39 @@ class Profile extends React.Component{
 
 
   async  componentDidMount(){
-    await this.get_user_info()
-    await this.get_user_interests()
-    this.props.navigation.addListener('focus',async()=>{
-        this.setState({is_loading:true})
-        await this.get_user_info()
-        await this.get_user_interests()
+     const user = await AsyncStorage.getItem('user')
+     const parse = JSON.parse(user)
+    
+     if(parse == null){
+         this.setState({is_logged_in:false,is_loading:false})
+     }else{
+        this.setState({is_logged_in:true})
 
-      })
+         this.get_user_info()
+         this.get_user_interests()
+        this.props.navigation.addListener('focus',async()=>{
+            this.setState({is_loading:true})
+             this.get_user_info()
+             this.get_user_interests()
+    
+          })
+     } 
+    
     }
 
     render(){
+        if(this.state.is_logged_in){
+
         if(this.state.is_loading == false ){
         return(
             <ScrollView>
-            <LinearGradient  colors={['#5FA7C0', '#5FA7C0','#91C73E']} style={{width:'100%',height:Dimensions.get('window').width*2/8,alignItems:'center',justifyContent:'center'}}>
+            <LinearGradient  colors={['#5FA7C0', '#5FA7C0','#91C73E']} style={styles.container}>
                 <View >
                 
                 
-                <View style={{width:120,height:120,borderRadius:100,backgroundColor:'gray',position:'relative',borderColor:'gray',borderWidth:1,top:60,}}>
+                <View style={styles.avatar_container}>
 
-                <View style={{borderColor:'white',borderWidth:5,borderRadius:120,position:'relative',height:120,alignItems:'center',justifyContent:'center'}}>
+                <View style={styles.avatar}>
                 <Image source={require('../../assets/icon.png')} />
                 
                 </View>
@@ -163,13 +177,13 @@ class Profile extends React.Component{
                     
                     <View style={{flexDirection:'row',width:'90%',flexWrap:'wrap',justifyContent:'space-between',top:20}}>
                      
-                        {this.state.user_interests.map(data=>{
+                        {this.state.user_interests ?this.state.user_interests.map(data=>{
                             return(
                             <TouchableOpacity key={data.interest_id} style={{padding:5,alignItems:'center',justifyContent:'center',borderColor:'gray',borderWidth:1,borderRadius:20,marginTop:5,}}>
                             <Text>{data.interest_title}</Text>
                         </TouchableOpacity>
                             )
-                        })}
+                        }):null}
                         
                         
 
@@ -198,7 +212,17 @@ class Profile extends React.Component{
                 <ActivityIndicator color="blue" size="large" style={{marginTop:20}}/>
             )
         }
+    }else{
+        return(
+            <View style={styles.NotFoundContent}>
+                    <Image style={styles.NothingFoundImage} source={require('../../assets/nothingfound.png')}/>
+                    <Text style={styles.OOPs}>OOPs!</Text>
+                    <Text style={styles.NoSavedEventsText}>Please Login  </Text>
+                   
+                </View>
+        )
     }
+}
 }
 
 export default Profile

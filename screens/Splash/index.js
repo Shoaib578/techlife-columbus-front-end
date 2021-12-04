@@ -6,27 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 class Splash extends React.Component{
     
     componentDidMount(){
-        setTimeout(async()=>{
-            const interest = await AsyncStorage.getItem('interest')
+        setTimeout(()=>{
+            this.props.navigation.reset({
+                index:0,
+                routes:[{name:'HomeScreen'}],
+               
+            });
             
-
-            if(interest != null){
-              return  this.props.navigation.reset({
-                    index:0,
-                    routes:[{name:'Interest'}],
-                   
-                });
-            }
-
-            const user = await AsyncStorage.getItem('user')
-            const parse_user = JSON.parse(user)
-            if(parse_user == null){
-                this.props.navigation.navigate('LoginSignUp');
-
-            }else{
-                this.props.navigation.navigate('HomeScreen');
-
-            }
         },1000)
     }
     render(){

@@ -1,5 +1,5 @@
 import React from "react"
-import {Text, View, SafeAreaView, ScrollView, TouchableOpacity,Image} from 'react-native'
+import {Text, View, SafeAreaView, ScrollView, TouchableOpacity,Image, Alert, ActivityIndicator} from 'react-native'
 import styles from "./styles"
 import  AsyncStorage  from "@react-native-async-storage/async-storage"
 import base_url from '../../base_url'
@@ -7,7 +7,8 @@ class Interests extends React.Component{
     state = {
         data:[],
         selected_interest:[],
-        is_navigated_to_login:false
+        is_navigated_to_login:false,
+        is_loading:false
     }
     componentDidMount(){
         fetch(base_url+'/api/get_all_interests',{
@@ -46,42 +47,49 @@ class Interests extends React.Component{
     }
 
 
-    insert_interests = async()=>{
-        const interest_user_id = await AsyncStorage.getItem('interest')
-        this.state.selected_interest.map(interest=>{
-            fetch(base_url+'/api/insert_interests',{
-                method:'post',
-                body:JSON.stringify({
-                    "user_id":interest_user_id,
-                    "interest":interest,
-                   
-                }),
-                headers:{
-                    "Accept":"application/json",
-                    "Content-Type":"application/json"
-                }
-            })
-            .then(res=>{
-                res.json()
-                .then(async(resp)=>{
-                    console.log(resp.data)
-                    AsyncStorage.removeItem('interest')
-                    const interest = await AsyncStorage.getItem('interest')
-                    
-                        if(!this.state.is_navigated_to_login){
-                            this.setState({is_navigated_to_login:true})
-                            return this.props.navigation.reset({
-                                index:0,
-                                routes:[{name:'SignIn'}],
-                               
-                            });
-                        }
+    insert_interests = ()=>{
+        const interest_user_id = this.props.route.params.user_id
+
+        if(this.state.selected_interest.length>0){
+
+            this.setState({is_loading:true})
+            this.state.selected_interest.map(interest=>{
+                fetch(base_url+'/api/insert_interests',{
+                    method:'post',
+                    body:JSON.stringify({
+                        "user_id":interest_user_id,
+                        "interest":interest,
+                       
+                    }),
+                    headers:{
+                        "Accept":"application/json",
+                        "Content-Type":"application/json"
+                    }
+                })
+                .then(res=>{
+                    res.json()
+                    .then((resp)=>{
+                       
+                      
                         
-                   
-                  
+                            if(!this.state.is_navigated_to_login){
+                                this.setState({is_navigated_to_login:true,is_loading:false})
+                                return this.props.navigation.reset({
+                                    index:0,
+                                    routes:[{name:'SignIn'}],
+                                   
+                                });
+                            }
+                            
+                       
+                      
+                    })
                 })
             })
-        })
+        }else{
+            Alert.alert("Please Select Atleast One Interest")
+        }
+        
     }
         UpComingEvents(){
         this.props.navigation.navigate('HomeScreen')
@@ -129,7 +137,7 @@ class Interests extends React.Component{
            
                 
                 </View>
-
+                {this.state.is_loading?<ActivityIndicator color="blue" size="large" />:null}
                 <TouchableOpacity onPress={() => this.insert_interests()} style={styles.ContinueButton}>
                     <Text style={styles.ContinueButtonText}>Continue</Text>
                 </TouchableOpacity>

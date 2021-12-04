@@ -24,48 +24,81 @@ class EventDetails extends React.Component{
     state ={
         event_details:[],
         is_saved:false,
-        is_going:false
+        is_going:false,
+        is_logged_in:false
     }
 
     get_viewed_event = async()=>{
         const user = await AsyncStorage.getItem('user')
         const parse = JSON.parse(user)
-        console.log(parse.user_id)
-        fetch(base_url+'/api/view_event?event_id='+this.props.route.params.id+"&&user_id="+parse.user_id,{
-            method:'get',
-            
-            headers:{
-                "Accept":"application/json",
-                "Content-Type":"application/json"
-            }
-        })
-        .then(res=>res.json()
-        .then(resp=>{
-            console.log(resp.event)
-            if(resp.event.is_saved == 0){
-                this.setState({is_saved:false})
-            }else{
-                this.setState({is_saved:true})
-
-            }
-
-            if(resp.event.is_going == 0){
-                this.setState({is_going:false})
-            }else{
-                this.setState({is_going:true})
-
-            }
-            this.setState({event_details:resp.event})
-
-        })
-        )
+        
+        if(parse == null){
+            fetch(base_url+'/api/view_event?event_id='+this.props.route.params.id+"&&user_id="+null,{
+                method:'get',
+                
+                headers:{
+                    "Accept":"application/json",
+                    "Content-Type":"application/json"
+                }
+            })
+            .then(res=>res.json()
+            .then(resp=>{
+                console.log(resp.event)
+                if(resp.event.is_saved == 0){
+                    this.setState({is_saved:false})
+                }else{
+                    this.setState({is_saved:true})
+    
+                }
+    
+                if(resp.event.is_going == 0){
+                    this.setState({is_going:false})
+                }else{
+                    this.setState({is_going:true})
+    
+                }
+                this.setState({event_details:resp.event})
+    
+            })
+            )
+        }else{
+            fetch(base_url+'/api/view_event?event_id='+this.props.route.params.id+"&&user_id="+parse.user_id,{
+                method:'get',
+                
+                headers:{
+                    "Accept":"application/json",
+                    "Content-Type":"application/json"
+                }
+            })
+            .then(res=>res.json()
+            .then(resp=>{
+                console.log(resp.event)
+                if(resp.event.is_saved == 0){
+                    this.setState({is_saved:false})
+                }else{
+                    this.setState({is_saved:true})
+    
+                }
+    
+                if(resp.event.is_going == 0){
+                    this.setState({is_going:false})
+                }else{
+                    this.setState({is_going:true})
+    
+                }
+                this.setState({event_details:resp.event})
+    
+            })
+            )
+        }
+        
     }
 
 
     save_event = async()=>{
         const user = await AsyncStorage.getItem('user')
         const parse = JSON.parse(user)
-        console.log(parse.user_id)
+       
         fetch(base_url+'/api/save_event',{
             method:'post',
             body:JSON.stringify({
@@ -98,7 +131,7 @@ class EventDetails extends React.Component{
     make_going_event = async()=>{
         const user = await AsyncStorage.getItem('user')
         const parse = JSON.parse(user)
-        console.log(parse.user_id)
+       
         fetch(base_url+'/api/make_going_event',{
             method:'post',
             body:JSON.stringify({
@@ -126,8 +159,16 @@ class EventDetails extends React.Component{
         })
     }
 
-    componentDidMount(){
-        this.get_viewed_event()
+  async  componentDidMount(){
+    const user = await AsyncStorage.getItem('user')
+    const parse = JSON.parse(user)
+    if(parse == null){
+        this.setState({is_logged_in:false})
+    }else{
+        this.setState({is_logged_in:true})
+
+    }
+    this.get_viewed_event()
 
        
     }
@@ -160,7 +201,7 @@ class EventDetails extends React.Component{
 
             </SafeAreaView>
 
-            <View style={{flexDirection:'row'}}>
+           {this.state.is_logged_in?<View style={{flexDirection:'row'}}>
             <TouchableOpacity onPress={this.make_going_event} style={styles.going_button}>
                     <Text>{this.state.is_going == false?'Make it Going':'Make it Ungoing'}</Text>
             </TouchableOpacity>
@@ -168,7 +209,14 @@ class EventDetails extends React.Component{
             <TouchableOpacity onPress={this.save_event} style={styles.save_button}>
                     <Text>{this.state.is_saved == false ? 'Make it Save':'Make it Unsave'}</Text>
             </TouchableOpacity>
-            </View>
+            </View>:<View style={{alignSelf:'center',justifyContent:'center',marginTop:10}}>
+            <View style={styles.NotFoundContent}>
+                    <Image style={styles.NothingFoundImage} source={require('../../assets/nothingfound.png')}/>
+                    <Text style={styles.OOPs}>OOPs!</Text>
+                    <Text style={styles.NoSavedEventsText}>Please Login To Be Able To </Text>
+                    <Text style={styles.GoHomeAndSaveEvents}>Save and going the event</Text>
+                </View>
+            </View>}
 
             </ScrollView>
         )

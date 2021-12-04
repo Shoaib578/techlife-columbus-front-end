@@ -133,7 +133,35 @@ const styles = StyleSheet.create({
         width:'40%',
         marginLeft:20,
         marginTop:20
-    }
+    },
+    NotFoundContent:{
+        alignItems:'center'
+    },
+    NothingFoundImage:{
+        width:90, 
+        height:90
+    },
+
+    OOPs:{
+        color:'#565656', 
+        fontSize:48, 
+        marginTop:'7%', 
+        fontWeight:'bold'
+    },
+
+    NoSavedEventsText:{
+        color:'#565656', 
+        fontSize:16, 
+        marginTop:'5%', 
+        fontWeight:'bold'
+    },
+
+    GoHomeAndSaveEvents:{
+        color:'#C1BEBE', 
+        fontSize:15, 
+        marginTop:'2%', 
+        fontWeight:'bold'
+    },
 })
 
 export default styles

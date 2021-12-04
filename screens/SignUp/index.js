@@ -90,7 +90,7 @@ class SignUp extends React.Component{
             })
             .then(res=>{
                 res.json()
-                .then(async(resp)=>{
+                .then((resp)=>{
                     if(resp.msg == 'User Registered Successfully'){
                         this.setState({
                             name:'',
@@ -105,9 +105,9 @@ class SignUp extends React.Component{
                             password_error_state:'',
                             confirm_password_error_state:''
                         })
-                        await AsyncStorage.setItem('interest',resp.user_id.toString())
+                       
                         this.setState({is_loading:false})
-                        this.props.navigation.navigate('Interest');
+                        this.props.navigation.navigate('Interest',{user_id:resp.user_id});
                     }else{
                         this.setState({is_loading:false})
 

@@ -14,24 +14,29 @@ class Saved extends React.Component{
     get_all_saved_events = async()=>{
         const user = await AsyncStorage.getItem('user')
         const parse = JSON.parse(user)
-        fetch(base_url+'/api/get_saved_events?user_id='+parse.user_id,{
-            method:'get',
-           
-            headers:{
-                "Accept":"application/json",
-                "Content-Type":"application/json"
-            }
-        })
-        .then(res=>res.json()
-        .then(resp=>{
-            console.log(resp.saved_events)
-            this.setState({saved_events:resp.saved_events,is_loading:false})
-        })
-        )
-        .catch(err=>{
-            console.log('this is the error '+err)
-            this.setState({network_error:true,is_loading:false})
-        })
+        if(parse == null){
+            this.setState({saved_events:[],is_loading:false})
+        }else{
+            fetch(base_url+'/api/get_saved_events?user_id='+parse.user_id,{
+                method:'get',
+               
+                headers:{
+                    "Accept":"application/json",
+                    "Content-Type":"application/json"
+                }
+            })
+            .then(res=>res.json()
+            .then(resp=>{
+                console.log(resp.saved_events)
+                this.setState({saved_events:resp.saved_events,is_loading:false})
+            })
+            )
+            .catch(err=>{
+                console.log('this is the error '+err)
+                this.setState({network_error:true,is_loading:false})
+            })
+        }
+        
 
     }
 
