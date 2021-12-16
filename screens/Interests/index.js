@@ -118,7 +118,7 @@ class Interests extends React.Component{
                         <TouchableOpacity onPress={()=>this.select_interest(data.interest_id)} key={data.interest_id} style={styles.SingleCard}>
                        
                         
-                        <Image style={styles.CardImage} source={{uri:'http://192.168.10.5:8000/uploads/'+data.interest_image}}/>
+                        <Image style={styles.CardImage} source={{uri:base_url+'/uploads/'+data.interest_image}}/>
                        
                         <View style={{ flexDirection:'row',flexWrap:'wrap',position:'absolute',}}>
                         <Text style={{position:'absolute',fontSize:16,fontWeight:'bold',color:'white', right:13, top:-18}}>{data.interest_title}</Text>
